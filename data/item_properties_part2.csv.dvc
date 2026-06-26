@@ -1,0 +1,5 @@
+outs:
+- md5: e74ec953e7b192920b195dfd82dc2a4e
+  size: 408929907
+  hash: md5
+  path: item_properties_part2.csv

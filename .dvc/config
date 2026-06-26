@@ -1,0 +1,6 @@
+[core]
+    autostage = true
+    remote = homelab-remote
+['remote "homelab-remote"']
+    url = s3://product-recommendation
+    endpointurl = http://minio.homelab.local:9000
