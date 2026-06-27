@@ -1,1 +1,76 @@
+# ==========================================
+# Datasets and Large Data Files
+# ==========================================
+# Never commit raw data or heavy files to Git
 data/*.csv
+*.csv
+*.tsv
+*.json
+*.xml
+*.parquet
+*.feather
+*.h5
+*.hdf5
+*.npy
+*.npz
+*.sqlite
+
+# ==========================================
+# Saved Machine Learning Models & Weights
+# ==========================================
+# Large binary artifacts change constantly during training
+models/
+artifacts/
+*.pkl
+*.pickle
+*.joblib
+*.pth
+*.pt
+*.onnx
+*.pb
+*.ckpt
+*.savedmodel/
+*.weights
+
+# ==========================================
+# Experiment Tracking, Logs, & Cache
+# ==========================================
+# Exclude heavy training outputs and system caches
+runs/
+logs/
+*.log
+.tensorboard/
+.mlflow/
+mlruns/
+wandb/
+.hydra/
+.ipynb_checkpoints/
+.pytest_cache/
+.cache/
+
+# ==========================================
+# Python Environment & Package Managers
+# ==========================================
+# Keep environment dependencies out of version control
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+.env
+bin/
+lib/
+lib64/
+dist/
+build/
+*.egg-info/
+
+# ==========================================
+# IDEs and OS Files
+# ==========================================
+# System and text-editor specific junk
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
