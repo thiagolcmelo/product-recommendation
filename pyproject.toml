@@ -1,10 +1,17 @@
 [project]
 name = "product-recommendation"
 version = "0.1.0"
-description = "Add your description here"
+description = "A system to recommend products for customers based on their past behavior."
 readme = "README.md"
 requires-python = ">=3.10,<=3.12.3"
 dependencies = []
+
+[build-system]
+requires = ["uv_build>=0.7.19,<0.8.0"]
+build-backend = "uv_build"
+
+[project.scripts]
+sanity = "product_recommendation.main:sanity"
 
 [dependency-groups]
 dev = [
@@ -12,7 +19,16 @@ dev = [
     "jupyter>=1.1.1",
     "kaggle>=1.7.4.5",
     "matplotlib>=3.10.9",
+    "mypy>=2.1.0",
     "polars>=1.42.0",
     "pyarrow>=24.0.0",
+    "ruff>=0.15.20",
     "seaborn>=0.13.2",
 ]
+
+[tool.ruff.format]
+quote-style = "double"
+
+[[tool.mypy.overrides]]
+module = ["dvc.*"]
+follow_untyped_imports = true
