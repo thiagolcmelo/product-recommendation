@@ -23,7 +23,9 @@ dev = [
     "polars>=1.42.0",
     "pyarrow>=24.0.0",
     "ruff>=0.15.20",
+    "scikit-learn>=1.7.2",
     "seaborn>=0.13.2",
+    "torch>=2.12.1",
 ]
 
 [tool.ruff.format]

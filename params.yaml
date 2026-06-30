@@ -1,0 +1,10 @@
+prepare_categories:
+  category_tree_path: "data/category_tree.csv"
+  output_dir_path: "data/prepared"
+prepare_sessions:
+  events_path: "data/events.csv"
+  output_dir_path: "data/prepared"
+prepare_item_properties:
+  item_properties_part1_path: "data/item_properties_part1.csv"
+  item_properties_part2_path: "data/item_properties_part2.csv"
+  output_dir_path: "data/prepared"

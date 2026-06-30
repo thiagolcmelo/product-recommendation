@@ -1,0 +1,77 @@
+schema: '2.0'
+stages:
+  prepare_categories:
+    cmd: uv run scripts/prepare_categories.py
+    deps:
+    - path: data/category_tree.csv
+      hash: md5
+      md5: f0e1eb878ae66209004112f6355d7e83
+      size: 14454
+    - path: scripts/prepare_categories.py
+      hash: md5
+      md5: 98a6ff048ba4f228ee64562f7b81cf00
+      size: 2665
+    params:
+      params.yaml:
+        prepare_categories.category_tree_path: data/category_tree.csv
+        prepare_categories.output_dir_path: data/prepared
+    outs:
+    - path: data/prepared/categories.parquet
+      hash: md5
+      md5: f09f791e24edffe449429812d73923ab
+      size: 11579
+  prepare_sessions:
+    cmd: uv run scripts/prepare_sessions.py
+    deps:
+    - path: data/events.csv
+      hash: md5
+      md5: fddaf7c1c6a9df23a726500a08ffdd7e
+      size: 94237913
+    - path: scripts/prepare_sessions.py
+      hash: md5
+      md5: b21104567a619b14966e85b7ad4c7c89
+      size: 2215
+    params:
+      params.yaml:
+        prepare_sessions.events_path: data/events.csv
+        prepare_sessions.output_dir_path: data/prepared
+    outs:
+    - path: data/prepared/event_ids.json
+      hash: md5
+      md5: 587afaa11edd0941d5d59195025c4493
+      size: 59
+    - path: data/prepared/sessions.parquet
+      hash: md5
+      md5: 9a266935b211660834ed2168e8593e02
+      size: 18362625
+  prepare_item_properties:
+    cmd: uv run scripts/prepare_item_properties.py
+    deps:
+    - path: data/item_properties_part1.csv
+      hash: md5
+      md5: cb43a0682a1af76f1c1b60f9163ae47b
+      size: 484315749
+    - path: data/item_properties_part2.csv
+      hash: md5
+      md5: e74ec953e7b192920b195dfd82dc2a4e
+      size: 408929907
+    - path: scripts/prepare_item_properties.py
+      hash: md5
+      md5: 1a8313fc5f39c31db57507ded7a42068
+      size: 6700
+    params:
+      params.yaml:
+        prepare_item_properties.item_properties_part1_path: 
+          data/item_properties_part1.csv
+        prepare_item_properties.item_properties_part2_path: 
+          data/item_properties_part2.csv
+        prepare_item_properties.output_dir_path: data/prepared
+    outs:
+    - path: data/prepared/item_properties.parquet
+      hash: md5
+      md5: 8d0462eeea4246571a9d704a5cd0e273
+      size: 98260494
+    - path: data/prepared/item_properties_values_encoded.parquet
+      hash: md5
+      md5: c577c9538f0d0d020a9af96277810f40
+      size: 24718645

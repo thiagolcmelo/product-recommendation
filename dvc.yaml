@@ -1,0 +1,35 @@
+stages:
+  prepare_categories:
+    cmd: uv run scripts/prepare_categories.py
+    deps:
+      - scripts/prepare_categories.py
+      - ${prepare_categories.category_tree_path}
+    outs:
+      - ${prepare_categories.output_dir_path}/categories.parquet
+    params:
+      - prepare_categories.category_tree_path
+      - prepare_categories.output_dir_path
+  prepare_sessions:
+    cmd: uv run scripts/prepare_sessions.py
+    deps:
+      - scripts/prepare_sessions.py
+      - ${prepare_sessions.events_path}
+    outs:
+      - ${prepare_sessions.output_dir_path}/sessions.parquet
+      - ${prepare_sessions.output_dir_path}/event_ids.json
+    params:
+      - prepare_sessions.events_path
+      - prepare_sessions.output_dir_path
+  prepare_item_properties:
+    cmd: uv run scripts/prepare_item_properties.py
+    deps:
+      - scripts/prepare_item_properties.py
+      - ${prepare_item_properties.item_properties_part1_path}
+      - ${prepare_item_properties.item_properties_part2_path}
+    outs:
+      - ${prepare_item_properties.output_dir_path}/item_properties_values_encoded.parquet
+      - ${prepare_item_properties.output_dir_path}/item_properties.parquet
+    params:
+      - prepare_item_properties.item_properties_part1_path
+      - prepare_item_properties.item_properties_part2_path
+      - prepare_item_properties.output_dir_path
