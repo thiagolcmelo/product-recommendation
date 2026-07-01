@@ -11,7 +11,8 @@ def prepare_item_properties(
     output_dir_path: Path,
 ) -> None:
     """Prepare item properties."""
-    output_dir_path.parent.mkdir(parents=True, exist_ok=True)
+    print(f"Creating path: {output_dir_path.resolve()}")
+    output_dir_path.mkdir(parents=True, exist_ok=True)
 
     ldf_item_properties = pl.concat(
         [

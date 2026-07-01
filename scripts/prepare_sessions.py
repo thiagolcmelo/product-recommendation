@@ -8,7 +8,8 @@ from dvc import api as dvc_api
 
 def prepare_sessions(events_path: Path, output_dir_path: Path) -> None:
     """Prepare sessions from events."""
-    output_dir_path.parent.mkdir(parents=True, exist_ok=True)
+    print(f"Creating path: {output_dir_path.resolve()}")
+    output_dir_path.mkdir(parents=True, exist_ok=True)
 
     events = {
         "view": 1,

@@ -9,8 +9,8 @@ stages:
       size: 14454
     - path: scripts/prepare_categories.py
       hash: md5
-      md5: 2b30bd59133e19e1934c54a2f9b69351
-      size: 2512
+      md5: 1abeebf6da65b348139e6d3afab42c98
+      size: 2562
     params:
       params.yaml:
         prepare_categories.category_tree_path: data/category_tree.csv
@@ -29,8 +29,8 @@ stages:
       size: 94237913
     - path: scripts/prepare_sessions.py
       hash: md5
-      md5: a5466f70581aebd5577d969e8610cd0f
-      size: 2109
+      md5: 1bf951767bb26f3209e777010b393a41
+      size: 2159
     params:
       params.yaml:
         prepare_sessions.events_path: data/events.csv
@@ -57,8 +57,8 @@ stages:
       size: 408929907
     - path: scripts/prepare_item_properties.py
       hash: md5
-      md5: 1a8313fc5f39c31db57507ded7a42068
-      size: 6700
+      md5: c2160e7bc70d88ff7f12dec2cb1a0d30
+      size: 3731
     params:
       params.yaml:
         prepare_item_properties.item_properties_part1_path: 
@@ -69,9 +69,39 @@ stages:
     outs:
     - path: data/prepared/item_properties.parquet
       hash: md5
-      md5: 8d0462eeea4246571a9d704a5cd0e273
-      size: 98260494
+      md5: 46f98633188bb1e2d507ae970fb7cbf1
+      size: 106749385
     - path: data/prepared/item_properties_values_encoded.parquet
       hash: md5
       md5: c577c9538f0d0d020a9af96277810f40
       size: 24718645
+  featurize:
+    cmd: uv run scripts/featurize.py
+    deps:
+    - path: data/prepared/categories.parquet
+      hash: md5
+      md5: f09f791e24edffe449429812d73923ab
+      size: 11579
+    - path: data/prepared/item_properties.parquet
+      hash: md5
+      md5: 46f98633188bb1e2d507ae970fb7cbf1
+      size: 106749385
+    - path: data/prepared/sessions.parquet
+      hash: md5
+      md5: 9a266935b211660834ed2168e8593e02
+      size: 18362625
+    - path: scripts/featurize.py
+      hash: md5
+      md5: 503d64fc3087f70d5e101fb615b428e0
+      size: 1834
+    params:
+      params.yaml:
+        featurize.categories_path: data/prepared/categories.parquet
+        featurize.item_properties_path: data/prepared/item_properties.parquet
+        featurize.output_dir_path: data/prepared
+        featurize.sessions_path: data/prepared/sessions.parquet
+    outs:
+    - path: data/prepared/enriched_sessions.parquet
+      hash: md5
+      md5: 7b7840597f91bbde4a96e029fc5434eb
+      size: 30490060

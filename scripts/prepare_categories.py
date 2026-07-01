@@ -7,7 +7,8 @@ from dvc import api as dvc_api
 
 def prepare_categories(category_tree_path: Path, output_dir_path: Path) -> None:
     """Prepare categories from category tree."""
-    output_dir_path.parent.mkdir(parents=True, exist_ok=True)
+    print(f"Creating path: {output_dir_path.resolve()}")
+    output_dir_path.mkdir(parents=True, exist_ok=True)
 
     ldf_categories = pl.scan_csv(category_tree_path)
 
