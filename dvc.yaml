@@ -33,3 +33,17 @@ stages:
       - prepare_item_properties.item_properties_part1_path
       - prepare_item_properties.item_properties_part2_path
       - prepare_item_properties.output_dir_path
+  featurize:
+    cmd: uv run scripts/featurize.py
+    deps:
+      - scripts/featurize.py
+      - ${featurize.categories_path}
+      - ${featurize.item_properties_path}
+      - ${featurize.sessions_path}
+    outs:
+      - ${featurize.output_dir_path}/enriched_sessions.parquet
+    params:
+      - featurize.categories_path
+      - featurize.item_properties_path
+      - featurize.sessions_path
+      - featurize.output_dir_path

@@ -8,3 +8,8 @@ prepare_item_properties:
   item_properties_part1_path: "data/item_properties_part1.csv"
   item_properties_part2_path: "data/item_properties_part2.csv"
   output_dir_path: "data/prepared"
+featurize:
+  categories_path: "data/prepared/categories.parquet"
+  item_properties_path: "data/prepared/item_properties.parquet"
+  sessions_path: "data/prepared/sessions.parquet"
+  output_dir_path: "data/prepared"

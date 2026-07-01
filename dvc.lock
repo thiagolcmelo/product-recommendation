@@ -9,8 +9,8 @@ stages:
       size: 14454
     - path: scripts/prepare_categories.py
       hash: md5
-      md5: 98a6ff048ba4f228ee64562f7b81cf00
-      size: 2665
+      md5: 2b30bd59133e19e1934c54a2f9b69351
+      size: 2512
     params:
       params.yaml:
         prepare_categories.category_tree_path: data/category_tree.csv
@@ -29,8 +29,8 @@ stages:
       size: 94237913
     - path: scripts/prepare_sessions.py
       hash: md5
-      md5: b21104567a619b14966e85b7ad4c7c89
-      size: 2215
+      md5: a5466f70581aebd5577d969e8610cd0f
+      size: 2109
     params:
       params.yaml:
         prepare_sessions.events_path: data/events.csv
