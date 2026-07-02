@@ -34,42 +34,54 @@ def prepare_categories(category_tree_path: Path, output_dir_path: Path) -> None:
                 .collect()
             )
 
-        return ancestors
+        return ancestors + [category_id]
 
-    df_category_tree = (
+    (
         ldf_categories.with_columns(
-            ancestor_path=pl.col("categoryid").map_elements(
+            path=pl.col("categoryid").map_elements(
                 build_ancestors_path, return_dtype=pl.List(pl.Int32)
             )
         )
-        .select(
-            category_id=pl.col("categoryid"),
-            ancestor_path=pl.col("ancestor_path"),
-            ancestor_path_reversed=pl.col("ancestor_path").list.reverse(),
-        )
+        .rename({"categoryid": "category_id"})
+        .select(["category_id", "path"])
         .collect()
-    )
-
-    max_depth = df_category_tree.select(
-        pl.col("ancestor_path_reversed").list.len().max().alias("max_depth")
-    ).item()
-
-    (
-        df_category_tree.with_columns(
-            pl.col("ancestor_path_reversed")
-            .list.concat(pl.lit([0] * max_depth))
-            .list.slice(0, max_depth)
-            .alias("padded_path")
-        )
-        .with_columns(
-            [
-                pl.col("padded_path").list.get(i).alias(f"parent_id_{i + 1}")
-                for i in range(max_depth)
-            ]
-        )
-        .drop(["padded_path", "ancestor_path", "ancestor_path_reversed"])
         .write_parquet(output_dir_path / "categories.parquet")
     )
+
+    # df_category_tree = (
+    #     ldf_categories.with_columns(
+    #         ancestor_path=pl.col("categoryid").map_elements(
+    #             build_ancestors_path, return_dtype=pl.List(pl.Int32)
+    #         )
+    #     )
+    #     .select(
+    #         category_id=pl.col("categoryid"),
+    #         ancestor_path=pl.col("ancestor_path"),
+    #         ancestor_path_reversed=pl.col("ancestor_path").list.reverse(),
+    #     )
+    #     .collect()
+    # )
+
+    # max_depth = df_category_tree.select(
+    #     pl.col("ancestor_path_reversed").list.len().max().alias("max_depth")
+    # ).item()
+
+    # (
+    #     df_category_tree.with_columns(
+    #         pl.col("ancestor_path_reversed")
+    #         .list.concat(pl.lit([0] * max_depth))
+    #         .list.slice(0, max_depth)
+    #         .alias("padded_path")
+    #     )
+    #     .with_columns(
+    #         [
+    #             pl.col("padded_path").list.get(i).alias(f"parent_id_{i + 1}")
+    #             for i in range(max_depth)
+    #         ]
+    #     )
+    #     .drop(["padded_path", "ancestor_path", "ancestor_path_reversed"])
+    #     .write_parquet(output_dir_path / "categories.parquet")
+    # )
 
 
 if __name__ == "__main__":

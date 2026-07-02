@@ -40,7 +40,11 @@ def prepare_sessions(events_path: Path, output_dir_path: Path) -> None:
             .over(["visitorid", "session_id"])
         )
         .with_columns(
-            history=pl.concat_list("timestamp", "itemid", "event_id")
+            # history=pl.concat_list("timestamp", "itemid", "event_id")
+            # .implode()
+            # .over(["visitorid", "session_id"])
+            # .list.head(pl.col("session_event_id") - 1)
+            history=pl.col("itemid")
             .implode()
             .over(["visitorid", "session_id"])
             .list.head(pl.col("session_event_id") - 1)

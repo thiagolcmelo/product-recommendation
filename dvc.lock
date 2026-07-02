@@ -9,8 +9,8 @@ stages:
       size: 14454
     - path: scripts/prepare_categories.py
       hash: md5
-      md5: 1abeebf6da65b348139e6d3afab42c98
-      size: 2562
+      md5: 2732faba5adc623aab617a0a7ea9f546
+      size: 3011
     params:
       params.yaml:
         prepare_categories.category_tree_path: data/category_tree.csv
@@ -18,8 +18,8 @@ stages:
     outs:
     - path: data/prepared/categories.parquet
       hash: md5
-      md5: f09f791e24edffe449429812d73923ab
-      size: 11579
+      md5: f8c79ae181379ab37ec53d0fea585f53
+      size: 13141
   prepare_sessions:
     cmd: uv run scripts/prepare_sessions.py
     deps:
@@ -29,8 +29,8 @@ stages:
       size: 94237913
     - path: scripts/prepare_sessions.py
       hash: md5
-      md5: 1bf951767bb26f3209e777010b393a41
-      size: 2159
+      md5: 32f5f60b0567607f7497b136525da535
+      size: 2303
     params:
       params.yaml:
         prepare_sessions.events_path: data/events.csv
@@ -42,8 +42,8 @@ stages:
       size: 59
     - path: data/prepared/sessions.parquet
       hash: md5
-      md5: 9a266935b211660834ed2168e8593e02
-      size: 18362625
+      md5: 07edfc845729ccb97425eca320aca209
+      size: 12795323
   prepare_item_properties:
     cmd: uv run scripts/prepare_item_properties.py
     deps:
@@ -57,8 +57,8 @@ stages:
       size: 408929907
     - path: scripts/prepare_item_properties.py
       hash: md5
-      md5: c2160e7bc70d88ff7f12dec2cb1a0d30
-      size: 3731
+      md5: c7dc6c2625892b32715a997908b67124
+      size: 4617
     params:
       params.yaml:
         prepare_item_properties.item_properties_part1_path: 
@@ -69,31 +69,27 @@ stages:
     outs:
     - path: data/prepared/item_properties.parquet
       hash: md5
-      md5: 46f98633188bb1e2d507ae970fb7cbf1
-      size: 106749385
-    - path: data/prepared/item_properties_values_encoded.parquet
-      hash: md5
-      md5: c577c9538f0d0d020a9af96277810f40
-      size: 24718645
+      md5: d88ccea3651fc7eeb8a4555c63c8ef80
+      size: 42197008
   featurize:
     cmd: uv run scripts/featurize.py
     deps:
     - path: data/prepared/categories.parquet
       hash: md5
-      md5: f09f791e24edffe449429812d73923ab
-      size: 11579
+      md5: f8c79ae181379ab37ec53d0fea585f53
+      size: 13141
     - path: data/prepared/item_properties.parquet
       hash: md5
-      md5: 46f98633188bb1e2d507ae970fb7cbf1
-      size: 106749385
+      md5: d88ccea3651fc7eeb8a4555c63c8ef80
+      size: 42197008
     - path: data/prepared/sessions.parquet
       hash: md5
-      md5: 9a266935b211660834ed2168e8593e02
-      size: 18362625
+      md5: 07edfc845729ccb97425eca320aca209
+      size: 12795323
     - path: scripts/featurize.py
       hash: md5
-      md5: 503d64fc3087f70d5e101fb615b428e0
-      size: 1834
+      md5: 6bbe8c80673afe80acfec64e63676372
+      size: 1877
     params:
       params.yaml:
         featurize.categories_path: data/prepared/categories.parquet
@@ -103,5 +99,5 @@ stages:
     outs:
     - path: data/prepared/enriched_sessions.parquet
       hash: md5
-      md5: 7b7840597f91bbde4a96e029fc5434eb
-      size: 30490060
+      md5: 8590d7a70d35eaf8c679f5f4dc1bd7c7
+      size: 17004375

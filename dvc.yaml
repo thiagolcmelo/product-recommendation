@@ -27,7 +27,7 @@ stages:
       - ${prepare_item_properties.item_properties_part1_path}
       - ${prepare_item_properties.item_properties_part2_path}
     outs:
-      - ${prepare_item_properties.output_dir_path}/item_properties_values_encoded.parquet
+      # - ${prepare_item_properties.output_dir_path}/item_properties_values_encoded.parquet
       - ${prepare_item_properties.output_dir_path}/item_properties.parquet
     params:
       - prepare_item_properties.item_properties_part1_path
@@ -47,3 +47,13 @@ stages:
       - featurize.item_properties_path
       - featurize.sessions_path
       - featurize.output_dir_path
+  train_models:
+    cmd: uv run scripts/train_models.py
+    deps:
+      - scripts/train_models.py
+      - ${train_models.enriched_sessions_path}
+    outs:
+      - ${train_models.output_dir_path}/model.pkl
+    params:
+      - train_models.enriched_sessions_path
+      - train_models.output_dir_path

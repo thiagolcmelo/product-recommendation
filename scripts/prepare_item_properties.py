@@ -21,80 +21,104 @@ def prepare_item_properties(
         ]
     )
 
-    df_encoded_values = pl.concat(
-        [
-            ldf_item_properties.filter(pl.col("property").is_in(["available"]))
-            .with_columns(
-                property=pl.col("property"),
-                value_original=pl.col("value"),
-                value_encoded=pl.col("value").cast(pl.UInt32, strict=False),
-            )
-            .select(["property", "value_encoded", "value_original"])
-            .unique()
-            .sort(["property", "value_encoded"]),
-            ldf_item_properties.filter(pl.col("property").is_in(["categoryid"]))
-            .with_columns(
-                property=pl.col("property"),
-                value_original=pl.col("value"),
-                value_encoded=pl.col("value").cast(pl.UInt32, strict=False),
-            )
-            .select(["property", "value_encoded", "value_original"])
-            .unique()
-            .sort(["property", "value_encoded"]),
-            ldf_item_properties.filter(
-                ~pl.col("property").is_in(["categoryid", "available"])
-            )
-            .with_columns(
-                property=pl.col("property"),
-                value_original=pl.col("value"),
-                value_encoded=pl.col("value")
-                .rank("dense")
-                .over("property")
-                .cast(pl.UInt32),
-            )
-            .select(["property", "value_encoded", "value_original"])
-            .unique()
-            .sort(["property", "value_encoded"]),
-        ]
-    )
-    df_encoded_values.collect().write_parquet(
-        output_dir_path / "item_properties_values_encoded.parquet"
-    )
-
-    total_mingled_properties = (
-        ldf_item_properties.filter(
-            ~pl.col("property").is_in(["categoryid", "available"])
-        )
-        .select(pl.col("property").unique().cast(pl.Int32, strict=False).len())
-        .collect()
-        .item()
-    )
-
     (
-        ldf_item_properties.join(
-            df_encoded_values,
-            left_on=["property", "value"],
-            right_on=["property", "value_original"],
-            how="left",
+        ldf_item_properties.rename({"itemid": "item_id"})
+        .group_by(["item_id", "timestamp"])
+        .agg(
+            property_ids=pl.col("property")
+            .filter(~pl.col("property").is_in(["categoryid", "available"]))
+            .cast(pl.Int32)
+            .implode(),
+            availability=pl.col("value")
+            .filter(pl.col("property") == "available")
+            .first()
+            .cast(pl.Int8, strict=False)
+            .fill_null(2),
+            category_id=pl.col("value")
+            .filter(pl.col("property") == "categoryid")
+            .first()
+            .cast(pl.Int32, strict=False)
+            .fill_null(-1),
         )
-        .sort(["itemid", "timestamp"])
-        .pivot(
-            on="property",
-            index=["itemid", "timestamp"],
-            values="value_encoded",
-            on_columns=["available", "categoryid"]
-            + [str(i) for i in range(total_mingled_properties)],
-        )
-        .rename({"itemid": "item_id", "categoryid": "category_id"})
-        .with_columns(
-            available=pl.col("available").fill_null(2),
-            category_id=pl.col("category_id").fill_null(-1),
-        )
-        .fill_null(0)
-        .rename({str(i): f"property_{i}" for i in range(total_mingled_properties)})
+        .sort("timestamp")
         .collect()
         .write_parquet(output_dir_path / "item_properties.parquet")
     )
+
+    # df_encoded_values = pl.concat(
+    #     [
+    #         ldf_item_properties.filter(pl.col("property").is_in(["available"]))
+    #         .with_columns(
+    #             property=pl.col("property"),
+    #             value_original=pl.col("value"),
+    #             value_encoded=pl.col("value").cast(pl.UInt32, strict=False),
+    #         )
+    #         .select(["property", "value_encoded", "value_original"])
+    #         .unique()
+    #         .sort(["property", "value_encoded"]),
+    #         ldf_item_properties.filter(pl.col("property").is_in(["categoryid"]))
+    #         .with_columns(
+    #             property=pl.col("property"),
+    #             value_original=pl.col("value"),
+    #             value_encoded=pl.col("value").cast(pl.UInt32, strict=False),
+    #         )
+    #         .select(["property", "value_encoded", "value_original"])
+    #         .unique()
+    #         .sort(["property", "value_encoded"]),
+    #         ldf_item_properties.filter(
+    #             ~pl.col("property").is_in(["categoryid", "available"])
+    #         )
+    #         .with_columns(
+    #             property=pl.col("property"),
+    #             value_original=pl.col("value"),
+    #             value_encoded=pl.col("value")
+    #             .rank("dense")
+    #             .over("property")
+    #             .cast(pl.UInt32),
+    #         )
+    #         .select(["property", "value_encoded", "value_original"])
+    #         .unique()
+    #         .sort(["property", "value_encoded"]),
+    #     ]
+    # )
+    # df_encoded_values.collect().write_parquet(
+    #     output_dir_path / "item_properties_values_encoded.parquet"
+    # )
+
+    # total_mingled_properties = (
+    #     ldf_item_properties.filter(
+    #         ~pl.col("property").is_in(["categoryid", "available"])
+    #     )
+    #     .select(pl.col("property").unique().cast(pl.Int32, strict=False).len())
+    #     .collect()
+    #     .item()
+    # )
+
+    # (
+    #     ldf_item_properties.join(
+    #         df_encoded_values,
+    #         left_on=["property", "value"],
+    #         right_on=["property", "value_original"],
+    #         how="left",
+    #     )
+    #     .sort(["item_id", "timestamp"])
+    #     .pivot(
+    #         on="property",
+    #         index=["itemid", "timestamp"],
+    #         values="value_encoded",
+    #         on_columns=["available", "categoryid"]
+    #         + [str(i) for i in range(total_mingled_properties)],
+    #     )
+    #     .rename({"itemid": "item_id", "categoryid": "category_id"})
+    #     .with_columns(
+    #         available=pl.col("available").fill_null(2),
+    #         category_id=pl.col("category_id").fill_null(-1),
+    #     )
+    #     .fill_null(0)
+    #     .rename({str(i): f"property_{i}" for i in range(total_mingled_properties)})
+    #     .collect()
+    #     .write_parquet(output_dir_path / "item_properties.parquet")
+    # )
 
 
 if __name__ == "__main__":

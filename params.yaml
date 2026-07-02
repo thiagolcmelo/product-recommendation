@@ -13,3 +13,6 @@ featurize:
   item_properties_path: "data/prepared/item_properties.parquet"
   sessions_path: "data/prepared/sessions.parquet"
   output_dir_path: "data/prepared"
+train_models:
+  enriched_sessions_path: "data/prepared/enriched_sessions.parquet"
+  output_dir_path: "data/models"

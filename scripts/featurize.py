@@ -22,31 +22,28 @@ def featurize(
     print(f"Lazy loading path: {categories_path.resolve()}")
     ldf_categories = pl.scan_parquet(categories_path)
 
-    ldf_item_properties_with_categories = (
-        ldf_item_properties
-            .select(pl.all().sort_by("timestamp").over("item_id"))
-            .join(
-                ldf_categories,
-                left_on="category_id",
-                right_on="category_id",
-                how="left",
-            )
+    ldf_item_properties_with_categories = ldf_item_properties.select(
+        pl.all().sort_by("timestamp").over("item_id")
+    ).join(
+        ldf_categories,
+        left_on="category_id",
+        right_on="category_id",
+        how="left",
     )
 
     (
-        ldf_sessions
-            .select(pl.all().sort_by("timestamp").over("visitor_id"))
-            .join_asof(
-                ldf_item_properties_with_categories,
-                on="timestamp",
-                by="item_id",
-                strategy="backward"
-            )
-            .fill_null(0)
-            .collect()
-            .write_parquet(output_dir_path / "enriched_sessions.parquet")
+        ldf_sessions.select(pl.all().sort_by("timestamp").over("visitor_id"))
+        .join_asof(
+            ldf_item_properties_with_categories,
+            on="timestamp",
+            by="item_id",
+            strategy="backward",
+        )
+        .fill_null(0)
+        .rename({"item_id": "target"})
+        .collect()
+        .write_parquet(output_dir_path / "enriched_sessions.parquet")
     )
-
 
 
 if __name__ == "__main__":
