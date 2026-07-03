@@ -12,7 +12,15 @@ featurize:
   categories_path: "data/prepared/categories.parquet"
   item_properties_path: "data/prepared/item_properties.parquet"
   sessions_path: "data/prepared/sessions.parquet"
+  categories_metadata_path: "data/prepared/categories_metadata.json"
+  item_properties_metadata_path: "data/prepared/item_properties_metadata.json"
   output_dir_path: "data/prepared"
-train_models:
+train_baseline_model:
   enriched_sessions_path: "data/prepared/enriched_sessions.parquet"
-  output_dir_path: "data/models"
+  metadata_path: "data/prepared/metadata.json"
+  output_dir_path: "models"
+  batch_size: 64
+  learning_rate: 0.001
+  num_epochs: 5
+  output_dim: 32
+  model_version: "1.0.0"

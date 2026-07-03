@@ -6,6 +6,7 @@ stages:
       - ${prepare_categories.category_tree_path}
     outs:
       - ${prepare_categories.output_dir_path}/categories.parquet
+      - ${prepare_categories.output_dir_path}/categories_metadata.json
     params:
       - prepare_categories.category_tree_path
       - prepare_categories.output_dir_path
@@ -29,6 +30,7 @@ stages:
     outs:
       # - ${prepare_item_properties.output_dir_path}/item_properties_values_encoded.parquet
       - ${prepare_item_properties.output_dir_path}/item_properties.parquet
+      - ${prepare_item_properties.output_dir_path}/item_properties_metadata.json
     params:
       - prepare_item_properties.item_properties_part1_path
       - prepare_item_properties.item_properties_part2_path
@@ -42,18 +44,28 @@ stages:
       - ${featurize.sessions_path}
     outs:
       - ${featurize.output_dir_path}/enriched_sessions.parquet
+      - ${featurize.output_dir_path}/metadata.json
     params:
       - featurize.categories_path
       - featurize.item_properties_path
       - featurize.sessions_path
       - featurize.output_dir_path
-  train_models:
-    cmd: uv run scripts/train_models.py
+      - featurize.categories_metadata_path
+      - featurize.item_properties_metadata_path
+  train_baseline_model:
+    cmd: uv run scripts/train_baseline_model.py
     deps:
-      - scripts/train_models.py
-      - ${train_models.enriched_sessions_path}
+      - scripts/train_baseline_model.py
+      - ${train_baseline_model.enriched_sessions_path}
+      - ${train_baseline_model.metadata_path}
     outs:
-      - ${train_models.output_dir_path}/model.pkl
+      - ${train_baseline_model.output_dir_path}/two_tower_recommender_baseline_model_v${train_baseline_model.model_version}.pkl
     params:
-      - train_models.enriched_sessions_path
-      - train_models.output_dir_path
+      - train_baseline_model.enriched_sessions_path
+      - train_baseline_model.metadata_path
+      - train_baseline_model.output_dir_path
+      - train_baseline_model.batch_size
+      - train_baseline_model.learning_rate
+      - train_baseline_model.num_epochs
+      - train_baseline_model.output_dim
+      - train_baseline_model.model_version

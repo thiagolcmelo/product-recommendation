@@ -1,8 +1,13 @@
 # -*- coding: utf-8 -*-
+import sys
 from pathlib import Path
 
 import polars as pl
 from dvc import api as dvc_api
+
+parent_dir = str(Path(__file__).resolve().parent.parent)
+sys.path.append(parent_dir)
+from scripts.utils import update_metadata  # noqa: E402
 
 
 def prepare_categories(category_tree_path: Path, output_dir_path: Path) -> None:
@@ -35,6 +40,21 @@ def prepare_categories(category_tree_path: Path, output_dir_path: Path) -> None:
             )
 
         return ancestors + [category_id]
+
+    categories_metadata = ldf_categories.select(
+        min_category_id=pl.col("categoryid").min(),
+        max_category_id=pl.col("categoryid").max(),
+        num_categories=pl.col("categoryid").n_unique(),
+    ).collect()
+    metadata = {
+        "num_categories": categories_metadata["num_categories"].item(),
+        "min_category_id": categories_metadata["min_category_id"].item(),
+        "max_category_id": categories_metadata["max_category_id"].item(),
+    }
+    update_metadata(
+        existing_metadata_path=output_dir_path / "categories_metadata.json",
+        new_metadata=metadata,
+    )
 
     (
         ldf_categories.with_columns(

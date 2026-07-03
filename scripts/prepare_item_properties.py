@@ -1,8 +1,13 @@
 # -*- coding: utf-8 -*-
+import sys
 from pathlib import Path
 
 import polars as pl
 from dvc import api as dvc_api
+
+parent_dir = str(Path(__file__).resolve().parent.parent)
+sys.path.append(parent_dir)
+from scripts.utils import update_metadata  # noqa: E402
 
 
 def prepare_item_properties(
@@ -19,6 +24,36 @@ def prepare_item_properties(
             pl.scan_csv(item_properties_part1_path),
             pl.scan_csv(item_properties_part2_path),
         ]
+    )
+
+    item_properties_metadata = ldf_item_properties.select(
+        min_item_id=pl.col("itemid").min(),
+        max_item_id=pl.col("itemid").max(),
+        num_items=pl.col("itemid").n_unique(),
+        max_property_id=pl.col("property")
+        .cast(pl.Int32, strict=False)
+        .drop_nulls()
+        .max(),
+        min_property_id=pl.col("property")
+        .cast(pl.Int32, strict=False)
+        .drop_nulls()
+        .min(),
+        num_properties=pl.col("property")
+        .cast(pl.Int32, strict=False)
+        .drop_nulls()
+        .n_unique(),
+    ).collect()
+    metadata = {
+        "item_properties": item_properties_metadata["num_items"].item(),
+        "min_item_id": item_properties_metadata["min_item_id"].item(),
+        "max_item_id": item_properties_metadata["max_item_id"].item(),
+        "min_property_id": item_properties_metadata["min_property_id"].item(),
+        "max_property_id": item_properties_metadata["max_property_id"].item(),
+        "num_properties": item_properties_metadata["num_properties"].item(),
+    }
+    update_metadata(
+        existing_metadata_path=output_dir_path / "item_properties_metadata.json",
+        new_metadata=metadata,
     )
 
     (

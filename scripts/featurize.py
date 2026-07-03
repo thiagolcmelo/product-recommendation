@@ -1,17 +1,23 @@
 # -*- coding: utf-8 -*-
+import json
+import sys
 from pathlib import Path
 
 import polars as pl
 from dvc import api as dvc_api
 
+parent_dir = str(Path(__file__).resolve().parent.parent)
+sys.path.append(parent_dir)
+from scripts.utils import update_metadata  # noqa: E402
 
-def featurize(
+
+def merge_sessions_with_item_properties(
     categories_path: Path,
     item_properties_path: Path,
     sessions_path: Path,
     output_dir_path: Path,
 ) -> None:
-    """Train models."""
+    """Merge sessions with item properties."""
     print(f"Creating path: {output_dir_path.resolve()}")
     output_dir_path.mkdir(parents=True, exist_ok=True)
 
@@ -46,6 +52,53 @@ def featurize(
     )
 
 
+def merge_metadata(
+    categories_metadata_path: Path,
+    item_properties_metadata_path: Path,
+    output_metadata_path: Path,
+) -> None:
+    """Merge metadata from categories and item properties."""
+
+    with open(categories_metadata_path, "r") as f:
+        categories_metadata = json.load(f)
+
+    with open(item_properties_metadata_path, "r") as f:
+        item_properties_metadata = json.load(f)
+
+    merged_metadata = {
+        "categories_metadata": {**categories_metadata},
+        "item_properties_metadata": {**item_properties_metadata},
+    }
+
+    update_metadata(
+        existing_metadata_path=output_metadata_path,
+        new_metadata=merged_metadata,
+    )
+
+
+def featurize(
+    categories_path: Path,
+    item_properties_path: Path,
+    sessions_path: Path,
+    output_dir_path: Path,
+    categories_metadata_path: Path,
+    item_properties_metadata_path: Path,
+) -> None:
+    """Featurize sessions with item properties and categories."""
+    merge_sessions_with_item_properties(
+        categories_path,
+        item_properties_path,
+        sessions_path,
+        output_dir_path,
+    )
+
+    merge_metadata(
+        categories_metadata_path,
+        item_properties_metadata_path,
+        output_dir_path / "metadata.json",
+    )
+
+
 if __name__ == "__main__":
     params = dvc_api.params_show(stages="featurize").get("featurize")
     if params is None:
@@ -56,4 +109,6 @@ if __name__ == "__main__":
         Path(params["item_properties_path"]),
         Path(params["sessions_path"]),
         Path(params["output_dir_path"]),
+        Path(params["categories_metadata_path"]),
+        Path(params["item_properties_metadata_path"]),
     )
